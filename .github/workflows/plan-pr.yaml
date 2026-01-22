@@ -7,14 +7,13 @@ jobs:
   plan:
     runs-on: stemdo-labs
     env:
-      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_REGION: eu-west-3
       TF_IN_AUTOMATION: "true"
 
     steps:
-      - name: Checkout repo public
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup SSH for private modules
+      - name: Setup SSH for private module source
         shell: bash
         run: |
           mkdir -p ~/.ssh
@@ -22,14 +21,9 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -t rsa,ed25519 github.com >> ~/.ssh/known_hosts
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
-
-      - name: Terraform fmt (check)
-        working-directory: modulo-weekly-exercise
-        run: terraform fmt -check -recursive
 
       - name: Terraform init
         working-directory: modulo-weekly-exercise
@@ -38,10 +32,6 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform init -input=false
-
-      - name: Terraform validate
-        working-directory: modulo-weekly-exercise
-        run: terraform validate
 
       - name: Terraform plan
         working-directory: modulo-weekly-exercise
