@@ -2,7 +2,7 @@
 
 module "vpc" {
 
-source = "git::https://github.com/stemdo-labs/terraform-weekly-exercise-fsancha.git//soluciones/modulo-weekly-exercise/modules/vpc?ref=main"
+  source              = "git::https://github.com/stemdo-labs/terraform-weekly-exercise-fsancha.git//soluciones/modulo-weekly-exercise/modules/vpc?ref=main"
   project_name        = var.project_name
   vpc_cidr            = var.vpc_cidr
   public_subnet_cidrs = var.public_subnet_cidrs
@@ -10,7 +10,7 @@ source = "git::https://github.com/stemdo-labs/terraform-weekly-exercise-fsancha.
 
 
 module "alb" {
-source = "git::https://github.com/stemdo-labs/terraform-weekly-exercise-fsancha.git//soluciones/modulo-weekly-exercise/modules/alb?ref=main"
+  source            = "git::https://github.com/stemdo-labs/terraform-weekly-exercise-fsancha.git//soluciones/modulo-weekly-exercise/modules/alb?ref=main"
   project_name      = var.project_name
   vpc_id            = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnet_ids
@@ -18,7 +18,7 @@ source = "git::https://github.com/stemdo-labs/terraform-weekly-exercise-fsancha.
 
 
 module "ec2" {
-source = "git::https://github.com/stemdo-labs/terraform-weekly-exercise-fsancha.git//soluciones/modulo-weekly-exercise/modules/ec2?ref=main"
+  source                = "git::https://github.com/stemdo-labs/terraform-weekly-exercise-fsancha.git//soluciones/modulo-weekly-exercise/modules/ec2?ref=main"
   project_name          = var.project_name
   public_subnet_ids     = module.vpc.public_subnet_ids
   alb_security_group_id = module.alb.alb_security_group_id
