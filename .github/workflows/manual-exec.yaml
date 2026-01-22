@@ -1,0 +1,58 @@
+name: terraform-manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Select Terraform action"
+        required: true
+        type: choice
+        default: plan
+        options:
+          - plan
+          - apply
+          - destroy
+
+jobs:
+  terraform:
+    runs-on: stemdo-labs
+
+    env:
+      AWS_REGION: eu-west-3
+      TF_IN_AUTOMATION: "true"
+
+    steps:
+      - name: Clone private infra repo (PAT classic)
+        run: |
+          git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/stemdo-labs/terraform-weekly-exercise-fsancha.git infra
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform init
+        working-directory: infra
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: terraform init -input=false
+
+      - name: Terraform ${{ inputs.action }}
+        working-directory: infra
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: |
+          if [ "${{ inputs.action }}" = "plan" ]; then
+            terraform plan -input=false
+          elif [ "${{ inputs.action }}" = "apply" ]; then
+            terraform apply -input=false -auto-approve
+          elif [ "${{ inputs.action }}" = "destroy" ]; then
+            terraform destroy -input=false -auto-approve
+          else
+            echo "Invalid action"
+            exit 1
+          fi
