@@ -9,13 +9,14 @@ jobs:
     env:
       AWS_REGION: eu-west-3
       TF_IN_AUTOMATION: "true"
+      GIT_TERMINAL_PROMPT: "0"
 
     steps:
       - name: Checkout repo public
         uses: actions/checkout@v4
 
-      # Esto hace que git use tu token automáticamente para cualquier https://github.com/...
-      - name: Configure git for private module access (HTTPS)
+      - name: Configure git auth for private modules (HTTPS)
+        shell: bash
         run: |
           git config --global url."https://${{ secrets.MODULES_GH_TOKEN }}:@github.com/".insteadOf "https://github.com/"
 
