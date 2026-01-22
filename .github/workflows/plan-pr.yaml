@@ -5,7 +5,7 @@ on:
 
 jobs:
   plan:
-    runs-on: stemdo-labs
+    runs-on: ubuntu-latest
     env:
       AWS_REGION: eu-west-3
       TF_IN_AUTOMATION: "true"
