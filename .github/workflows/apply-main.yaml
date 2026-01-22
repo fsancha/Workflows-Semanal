@@ -2,33 +2,44 @@ name: terraform-apply-main
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   apply:
     runs-on: stemdo-labs
     env:
-      AWS_REGION: eu-west-3
+      AWS_REGION: ${{ vars.AWS_REGION }}
       TF_IN_AUTOMATION: "true"
 
     steps:
-      - name: Clone private infra repo (PAT classic)
+      - name: Checkout repo public
+        uses: actions/checkout@v4
+
+      - name: Setup SSH for private modules
+        shell: bash
         run: |
-          git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/stemdo-labs/terraform-weekly-exercise-fsancha.git infra
+          mkdir -p ~/.ssh
+          echo "${{ secrets.TF_MODULES_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t rsa,ed25519 github.com >> ~/.ssh/known_hosts
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
 
       - name: Terraform init
-        working-directory: infra
+        working-directory: modulo-weekly-exercise
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform init -input=false
 
       - name: Terraform apply
-        working-directory: infra
+        working-directory: modulo-weekly-exercise
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: terraform apply -auto-approve
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: terraform apply -input=false -auto-approve
