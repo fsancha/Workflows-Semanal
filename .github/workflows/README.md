@@ -18,4 +18,4 @@ En esta carpeta se incluyen los ficheros YAML de los workflows solicitados para:
 
 ## Notas
 - Los comandos usan `terraform.tfvars` para cargar variables del proyecto.
-- El workflow manual incluye `terraform destroy` para cumplir la limpieza final del ejercicio.
+- El workflow manual incluye `terraform destroy` para cumplir la limpieza final del ejercicio
